@@ -1,0 +1,166 @@
+body{
+    background-color: black;
+}
+
+/* navbar */
+
+.navbar{
+    background-color: black;
+    color: white;
+}
+
+.navbar-brand{
+    font-family: 'Amatic SC', cursive;
+    font-weight: bold;
+    font-size: 30px;
+}
+
+.dropdown-menu-black{
+    background-color: black;
+}
+
+
+.home{
+    position: relative;
+    background-color: #DEB887;
+    background-image: url("../images/art.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    text-align: center;
+}
+
+.home-rect{
+    margin-top: 5rem;
+    display: inline-block;
+
+  
+    backdrop-filter: blur(10px);
+    color:white;
+    text-align: center;
+
+
+    /* border */
+    border:solid white;
+    border-color: white;
+    border-width: 3px 3px 5px 5px;
+    border-radius:4% 95% 6% 95%/95% 4% 92% 5%;
+
+
+}
+
+
+.home-rect h1{
+    font-family: 'Amatic SC', cursive;
+    font-size: 100px;
+    font-weight: bold;
+}
+
+.home-rect h4{
+    font-weight: lighter;
+    letter-spacing: 1px;
+}
+
+
+.home-btn-div{
+    padding-top: 2rem;
+}
+
+#signup-btn{
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 2rem;
+    color: white;
+    background-color: black;
+    border: 1px solid white;
+    box-shadow: 5px 5px 0px white;
+    letter-spacing: 2px;   
+}
+
+#signup-btn:hover{
+    background-color: white;
+    color: black;
+    box-shadow: 5px 5px 0px transparent;
+}
+
+#login-btn{
+    margin-left: 1rem;
+    margin-right: 1rem;
+    padding: 0.75rem 2rem;
+    color: white;
+    background-color: transparent;
+    border: 1px solid white;
+    box-shadow: 5px 5px 10px white;
+    letter-spacing: 2px;
+}
+
+#login-btn:hover{
+    background-color: white;
+    color: black;
+    box-shadow: 5px 5px 10px transparent;
+}
+
+
+
+
+/* carousel */
+
+#carouselInterval{
+    color: white;
+    backdrop-filter:blur(100px);
+}
+
+
+
+.ads h3{
+ font-weight: lighter;
+ letter-spacing: 1px;
+}
+.carousel-control-prev{
+    background-color:transparent;
+    border-color:transparent;
+}
+.carousel-control-next{
+    background-color:transparent;
+    border-color:transparent;
+}
+
+.ad-1{
+   text-align:left;
+   padding:1rem;
+}
+.ad-1 img{
+    border-radius:50%;
+    border: 1px solid white;
+}
+
+.col-img{
+    text-align: center;
+}
+
+.btn-outline-dark:hover{
+    background-color: black;
+}
+
+/* footer */
+footer{
+    background-color: black;
+    color: white;
+}
+
+footer a{
+    color:white;
+    text-decoration: none;
+}
+
+footer a:hover{
+    color:grey;
+}
+
+footer h3{
+    font-weight: lighter;
+}
+
+.copywrite{
+    text-align: center;
+}

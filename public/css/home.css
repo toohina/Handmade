@@ -2,22 +2,6 @@ body{
     background-color: black;
 }
 
-/* navbar */
-
-.navbar{
-    background-color: black;
-    color: white;
-}
-
-.navbar-brand{
-    font-family: 'Amatic SC', cursive;
-    font-weight: bold;
-    font-size: 30px;
-}
-
-.dropdown-menu-black{
-    background-color: black;
-}
 
 
 .home{
@@ -138,29 +122,13 @@ body{
     text-align: center;
 }
 
-.btn-outline-dark:hover{
-    background-color: black;
+.btn-outline-black{
+    background-color: transparent;
+    border: 1px solid black;
+    color:black;
 }
-
-/* footer */
-footer{
+.btn-outline-black:hover{
     background-color: black;
-    color: white;
-}
-
-footer a{
     color:white;
-    text-decoration: none;
 }
 
-footer a:hover{
-    color:grey;
-}
-
-footer h3{
-    font-weight: lighter;
-}
-
-.copywrite{
-    text-align: center;
-}

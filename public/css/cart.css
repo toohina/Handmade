@@ -1,0 +1,55 @@
+.cart{
+    padding-top: 5rem;
+}
+
+.card{
+    box-shadow: 5px 5px 10px grey;
+}
+
+.btn-delete{
+    background-color: red;
+    color:white;
+    box-shadow: 5px 5px 10px grey;
+    font-size: 15px;
+    border: 1px solid red;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+  
+}
+.btn-delete:hover{
+    box-shadow: 5px 5px 10px transparent;
+}
+
+.btn-buy{
+    background-color: black;
+    color:white;
+    box-shadow: 5px 5px 10px grey;
+    width:300px;
+    font-size: 24px;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding-top: 0.5rem;
+    padding-bottom:0.5rem;
+}
+
+.btn-buy:hover{
+    box-shadow: 5px 5px 10px transparent;
+}
+
+.btn-buy-div{
+    text-align: center;
+}
+
+.btn-move{
+    background-color: black;
+    color:white;
+    box-shadow: 5px 5px 10px grey;
+    font-size: 15px;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+}
+
+.btn-move:hover{
+    box-shadow: 5px 5px 10px transparent;
+}

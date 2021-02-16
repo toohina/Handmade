@@ -1,0 +1,38 @@
+.wish{
+    padding-top: 5rem;
+}
+
+.card{
+    box-shadow: 5px 5px 10px grey;
+}
+
+.btn-delete{
+    background-color: red;
+    color:white;
+    box-shadow: 5px 5px 10px grey;
+    font-size: 15px;
+    border: 1px solid red;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    width:300px;
+  
+}
+.btn-delete:hover{
+    box-shadow: 5px 5px 10px transparent;
+}
+
+
+.btn-move{
+    background-color: black;
+    color:white;
+    box-shadow: 5px 5px 10px grey;
+    font-size: 15px;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    width:300px;
+}
+
+.btn-move:hover{
+    box-shadow: 5px 5px 10px transparent;
+}

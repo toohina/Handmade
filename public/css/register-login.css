@@ -1,0 +1,12 @@
+.register{
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+}
+
+.card{
+    box-shadow: 5px 5px 10px grey;
+}
+
+h1{
+    font-weight: lighter;
+}

@@ -1,0 +1,36 @@
+.products{
+    padding-top:5rem;
+}
+.btn-pink{
+    background-color: #ff1493;
+    color:white;
+    border: 1px solid #ff1493;
+    padding: 0.5rem 2rem;
+    border-radius: 5px;
+}
+.btn-pink:hover{
+    background-color: #ff007f;
+    border: 1px solid #ff007f;
+}
+.card{
+    box-shadow: 5px 5px 10px grey;
+}
+.card:hover{
+    box-shadow:5px 5px 10px transparent;
+}
+
+.heart i{
+    text-shadow: 5px 5px 8px grey;
+}
+.cart i{
+    text-shadow: 5px 5px 8px grey;
+}
+.heart i:hover{
+    text-shadow: 5px 5px 8px transparent;
+    color:red;
+}
+
+.cart i:hover{
+    text-shadow: 5px 5px 8px transparent;
+    color:black;
+}

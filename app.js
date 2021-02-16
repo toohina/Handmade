@@ -12,8 +12,41 @@ app.use(express.static("public"));
 app.set("view engine","ejs");
 
 //routes
+
+
+//home
 app.get("/",(req,res)=>{
- res.render("home");
+    res.render("home",{"css":"home"});
+});
+
+
+
+//products
+app.get("/products",(req,res)=>{
+    res.render("products",{"css":"products"});
+});
+
+
+//cart
+app.get("/cart",(req,res)=>{
+    res.render("cart",{"css":"cart"});
+});
+
+//wish
+app.get("/wish",(req,res)=>{
+    res.render("wish",{"css":"wish"});
+});
+
+//login customer
+
+app.get("/login",(req,res)=>{
+    res.render("login",{"css":"login"});
+});
+
+//register customer
+
+app.get("/register",(req,res)=>{
+    res.render("register",{"css":"register-login"});
 });
 
 

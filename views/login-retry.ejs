@@ -6,9 +6,12 @@
               <h1 class="card-title">LOGIN</h1>
              <form  action="" class="py-3">
                 <h6>Email: </h6>
-                <input type="email" class="col-12 my-1 py-1">
+                <input type="email" class="col-12 my-1 py-1 form-control is-invalid">
                 <h6>Password: </h6>
-                <input type="password"class="col-12 my-1 py-1">
+                <input type="password"class="col-12 my-1 py-1 form-control is-invalid">
+                <div class="invalid-feedback">
+                    Wrong email or password!
+                </div>
                 <a href="">Forgot password?</a>
                 <button type="submit" class="btn btn-dark col-12 mt-5">Login</button>
              </form>

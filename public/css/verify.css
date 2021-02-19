@@ -1,0 +1,11 @@
+.verify{
+    margin-top: 8rem;
+    margin-bottom: 9rem;
+}
+.card-title{
+    font-weight: lighter;
+}
+
+.card{
+    box-shadow: 5px 5px 10px grey;
+}

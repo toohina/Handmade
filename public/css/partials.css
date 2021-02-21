@@ -1,3 +1,7 @@
+body{
+    scroll-behavior:auto;
+}
+
 /* navbar */
 
 .navbar{

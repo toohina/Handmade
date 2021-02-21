@@ -53,3 +53,13 @@
 .btn-move:hover{
     box-shadow: 5px 5px 10px transparent;
 }
+
+
+.qty{
+    background-color: white;
+    border:1px solid black;
+    border-radius: 5px;
+    display: inline-block;
+    width: 155px;
+    text-align: center;
+}

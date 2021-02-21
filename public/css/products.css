@@ -8,15 +8,27 @@
     padding: 0.5rem 2rem;
     border-radius: 5px;
 }
+
+.btn-black{
+    background-color: rgba(0, 0, 0, 0.877);
+    color:white;
+    border: 1px solid rgba(0, 0, 0, 0.877);
+    padding: 0.5rem 2rem;
+    border-radius: 5px;
+}
+
 .btn-pink:hover{
     background-color: #ff007f;
     border: 1px solid #ff007f;
 }
+
+.btn-black:hover{
+    background-color: black;
+    border: 1px solid black;
+}
+
 .card{
     box-shadow: 5px 5px 10px grey;
-}
-.card:hover{
-    box-shadow:5px 5px 10px transparent;
 }
 
 .heart i{

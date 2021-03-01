@@ -1,41 +1,44 @@
 <%-include("partials/header.ejs")%>
 <section class="cart">
-    <div class="row row-cols-1 gy-5 mx-auto">
         <%if(products.length!=0){for(var i=0;i<products.length;i++){%>
-                <div class="col">   
-                    <div class="row">
-                        <div class="col">
-                            <div class="card mx-auto" style="width: 20rem;">
-                                <img src="<%=products[i].imgUrl%> " class="card-img-top" alt="..." height="300px">
+                <div class="center">   
+                    <div class="in mx-5">
+                        <div class="card" style="width: 175px;">
+                            <img src="<%=products[i].imgUrl%> " class="card-img-top" alt="..." height="100px">
                                 <div class="card-body">
-                                  <h5 class="card-title"><%=products[i].name%></h5>
-                                  <h2 class="card-text">Rs <%=products[i].price%></h2>
-                                </div>
-                              </div> 
-                        </div>
-                       <div class="col">
-                           <div class="my-5 my-sm-1">
-                               <form action="/changeQty" method="POST">
-                                <h2>Quantity:      <input onChange="this.form.submit()" class="qty" type="number" name="qty" min="1" max="20" value="<%=qty[i]%>"></h2>
-                               </form>
-                           </div>
-                           <div class="my-5">
-                            <a href="#"><button class="btn-delete"><i class="fas fa-trash-alt"></i> Delete from cart</button></a> 
-                           </div>
-                           <div class="my-5">
-                            <a href="#"><button class="btn-move"><i class="fas fa-heart"></i> Move to wishlist</button></a> 
-                           </div>
-                       </div>
-                    </div>      
-                </div>
-                <hr>      
-        <%}}else{%>
-            <h1>The cart is Empty!</h1>
+                                  <p class="card-title"><%=products[i].name%></p>
+                                  <h5 class="card-text">Rs <%=products[i].price%></h5>
+                                  </div>
+                              </div>  
+                    </div>
+               
+                          <div class="in-2 mx-5">
+                            <div class="my-3">
+                                <form action="/changeQty" method="POST">
+                                 <input type="hidden" name="index" value="<%=i%>">
+                                 <h5>Quantity:      <input onChange="this.form.submit()" class="qty" type="number" name="qty" min="1" max="20" value="<%=qty[i]%>"></h5>
+                                </form>
+                            </div>
+                            <div class="my-3">
+                                <form action="/deleteFromCart" method="POST">
+                                 <input type="hidden" name="index" value="<%=i%>">
+                                     <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i> Delete from cart</button>
+                                 </form>
+                             </div>
+                            <div class="my-3">
+                             <a href="#"><button class="btn-move"><i class="fas fa-heart"></i> Move to wishlist</button></a> 
+                            </div>
+                          </div>
+                       
+                       </div>  
+                       <hr>  
+                     
+        <%}%>
+        <div class="btn-buy-div"><h2 class="total"></h2><button class="btn-buy">BUY NOW</button></a></div> 
+        <%}else{%>
+            <h1 class="my-5 p-md-5 py-5">The cart is Empty!</h1>
      <%}%>
-    </div>
-    <div class="btn-buy-div"><button class="btn-buy">BUY NOW</button></a></div>
+ 
 </section>
-
-<!-- javascript -->
-<script type="text/javascript" src="./js/cart.js"></script>
+<script src="/js/cart.js"></script>
 <%-include("partials/footer.ejs")%>

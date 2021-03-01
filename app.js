@@ -4,6 +4,7 @@ const bodyParser=require("body-parser");
 const ejs=require("ejs");
 const nodemailer = require("nodemailer");
 const {generateOtp}=require("./generate-otp");
+//const {getSum}=require("./get-sum");
 const mongoose=require("mongoose");
 
 const app=express();
@@ -70,12 +71,19 @@ app.get("/decor",(req,res)=>{
 ////////////////////////////////////////////////////////cart///////////////////////////////////////////////////
 let unregisteredUserCartProducts=[];
 let qty=[];
+
 app.get("/cart",(req,res)=>{
     //if user is registered
 
 
     //else
-   
+ 
+ 
+    // sum=0;
+    // for(var i=0;i<qty.length;i++){
+    //     sum+=unregisteredUserCartProducts[i].price*qty[i];
+    // }
+ 
     res.render("cart",{css:"cart",products:unregisteredUserCartProducts,qty:qty});
 });
 app.post("/addToCart",(req,res)=>{
@@ -89,7 +97,7 @@ app.post("/addToCart",(req,res)=>{
         if(unregisteredUserCartProducts.length!=0){
             for(var i=0;i<unregisteredUserCartProducts.length;i++){
                 if(JSON.stringify(unregisteredUserCartProducts[i])===JSON.stringify(product)){
-                    qty[i]=qty[i]+1;
+                    qty[i]=Number(qty[i])+1;
                     k=1;
                     break;
                 }
@@ -102,20 +110,42 @@ app.post("/addToCart",(req,res)=>{
             qty.push(1);
             unregisteredUserCartProducts.push(product);
         }
-        
-        
-
-        res.redirect("/"+product.category);
-    });  
+        res.status(204).send();  //////////vvi
+    });
 });
 
 app.post("/changeQty",(req,res)=>{
-    console.log(req.body);
+    //if registered
+
+
+
+    //else
+    qty[req.body.index]=req.body.qty;
+    res.status(204).send();
 });
 
+app.post("/deleteFromCart",(req,res)=>{
+    //if registered
 
 
+    //else
+    let tempQty=[];
+    let tempUnregisteredUserCartProducts=[];
+    for(var i=0;i<qty.length;i++){
+        if(i!=req.body.index){
+            tempQty.push(qty[i]);
+            tempUnregisteredUserCartProducts.push(unregisteredUserCartProducts[i]);
+        }
+    }
+    qty=tempQty.slice();
+    unregisteredUserCartProducts=tempUnregisteredUserCartProducts.slice();
+    res.redirect("/cart");
+});
 
+//////////////////////////////////////////////////////////////wish///////////////////////////////////////////////////////////
+app.get("/wish",(req,res)=>{
+    res.render("wish",{css:"wish",});
+});
 
 
 //login customer

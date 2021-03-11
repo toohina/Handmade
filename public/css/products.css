@@ -1,4 +1,5 @@
 .products{
+    min-height: 30vh;
     padding-top:5rem;
 }
 .btn-pink{

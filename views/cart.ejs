@@ -1,6 +1,12 @@
 <%-include("partials/header.ejs")%>
 <section class="cart">
-        <%if(products.length!=0){for(var i=0;i<products.length;i++){%>
+        <%if(products.length!=0){%>
+            <div class="btn-buy-div"><h2 class="total">Rs <%= total %> </h2>
+                <button class="btn-buy" id="checkout-button">Checkout</button>
+            </div> 
+            <hr>
+            <%for(var i=0;i<products.length;i++){%>
+                <input type="hidden" name="productId" value="<%=products[i].id%>">
                 <div class="center">   
                     <div class="in mx-5">
                         <div class="card" style="width: 175px;">
@@ -21,12 +27,15 @@
                             </div>
                             <div class="my-3">
                                 <form action="/deleteFromCart" method="POST">
-                                 <input type="hidden" name="index" value="<%=i%>">
-                                     <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i> Delete from cart</button>
+                                    <input type="hidden" name="index" value="<%=i%>">
+                                    <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i> Delete from cart</button>
                                  </form>
                              </div>
                             <div class="my-3">
-                             <a href="#"><button class="btn-move"><i class="fas fa-heart"></i> Move to wishlist</button></a> 
+                                <form action="/moveToWishlist" method="POST">
+                                    <input type="hidden" name="index" value="<%=i%>">
+                                    <button type="submit" class="btn-move"><i class="fas fa-heart"></i> Move to wishlist</button> 
+                                </form>
                             </div>
                           </div>
                        
@@ -34,11 +43,12 @@
                        <hr>  
                      
         <%}%>
-        <div class="btn-buy-div"><h2 class="total"></h2><button class="btn-buy">BUY NOW</button></a></div> 
+        <!-- <div class="btn-buy-div"><h2 class="total"></h2><button class="btn-buy" >BUY NOW</button></a></div>  -->
         <%}else{%>
-            <h1 class="my-5 p-md-5 py-5">The cart is Empty!</h1>
+            <div  style="padding-top:4rem">
+                <h1 class="my-5 p-md-5 py-5">The cart is Empty!</h1>
+            </div>
      <%}%>
  
 </section>
-<script src="/js/cart.js"></script>
 <%-include("partials/footer.ejs")%>

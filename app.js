@@ -6,8 +6,11 @@ const nodemailer = require("nodemailer");
 const {generateOtp}=require("./generate-otp");
 //const {getSum}=require("./get-sum");
 const mongoose=require("mongoose");
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const app=express();
+
+const YOUR_DOMAIN = 'https://fierce-mesa-16226.herokuapp.com';
 
 mongoose.connect("mongodb://localhost:27017/handmadeDB",{useNewUrlParser:true, useUnifiedTopology: true, useFindAndModify: false });
 
@@ -35,10 +38,21 @@ const Customer=mongoose.model("Customer",customerSchema);
 
 //middleware
 app.use(bodyParser.urlencoded({extended:true}));
-app.use(express.static("public"));
+app.use(express.static(__dirname+"/public"));
 app.set("view engine","ejs");
 
 //ROUTES
+
+
+//register customer
+
+app.get("/register",(req,res)=>{
+    res.render("register",{"css":"register-login"});
+});
+
+app.post("/register",(req,res)=>{
+
+});
 
 
 //home
@@ -71,21 +85,23 @@ app.get("/decor",(req,res)=>{
 ////////////////////////////////////////////////////////cart///////////////////////////////////////////////////
 let unregisteredUserCartProducts=[];
 let qty=[];
+let total=0;
+
+let unregisteredUserWishlistProducts=[];
 
 app.get("/cart",(req,res)=>{
     //if user is registered
 
 
-    //else
- 
- 
-    // sum=0;
-    // for(var i=0;i<qty.length;i++){
-    //     sum+=unregisteredUserCartProducts[i].price*qty[i];
-    // }
- 
-    res.render("cart",{css:"cart",products:unregisteredUserCartProducts,qty:qty});
+    //else 
+    sum=0;
+    for(var i=0;i<unregisteredUserCartProducts.length;i++){
+        sum+=unregisteredUserCartProducts[i].price*qty[i];
+    }
+    total=sum;
+    res.render("cart",{css:"cart",products:unregisteredUserCartProducts,qty:qty,total:total});
 });
+
 app.post("/addToCart",(req,res)=>{
     // if user is registered
 
@@ -121,7 +137,9 @@ app.post("/changeQty",(req,res)=>{
 
     //else
     qty[req.body.index]=req.body.qty;
-    res.status(204).send();
+
+    //res.status(204).send();
+    res.redirect("/cart");
 });
 
 app.post("/deleteFromCart",(req,res)=>{
@@ -142,11 +160,100 @@ app.post("/deleteFromCart",(req,res)=>{
     res.redirect("/cart");
 });
 
-//////////////////////////////////////////////////////////////wish///////////////////////////////////////////////////////////
-app.get("/wish",(req,res)=>{
-    res.render("wish",{css:"wish",});
+app.post("/moveToWishlist",(req,res)=>{
+    let present=0;
+    for(var i=0;i<unregisteredUserWishlistProducts.length;i++){
+        console.log(unregisteredUserWishlistProducts[i]);
+        if(JSON.stringify(unregisteredUserWishlistProducts[i])===JSON.stringify(unregisteredUserCartProducts[req.body.index])){
+            present=1;
+            break;
+        }
+    }
+    if(present==0){
+        unregisteredUserWishlistProducts.push(unregisteredUserCartProducts[req.body.index])
+    }
+   
+    let tempQty=[];
+    let tempUnregisteredUserCartProducts=[];
+    for(var i=0;i<qty.length;i++){
+        if(i!=req.body.index){
+            tempQty.push(qty[i]);
+            tempUnregisteredUserCartProducts.push(unregisteredUserCartProducts[i]);
+        }
+    }
+    qty=tempQty;
+    unregisteredUserCartProducts=tempUnregisteredUserCartProducts;
+    res.redirect("/cart");
 });
 
+
+//////////////////////////////////////////////////////////////wish///////////////////////////////////////////////////////////
+
+
+app.get("/wish",(req,res)=>{
+    res.render("wish",{css:"wish",products:unregisteredUserWishlistProducts});
+});
+
+app.post("/addToWishlist",(req,res)=>{
+     // if user is registered
+
+
+    //else
+   
+    Product.findOne({"_id":req.body.productId},(err,product)=>{
+        let k=0;
+        if(unregisteredUserWishlistProducts.length!=0){
+            for(var i=0;i<unregisteredUserWishlistProducts.length;i++){
+                if(JSON.stringify(unregisteredUserWishlistProducts[i])===JSON.stringify(product)){
+                    k=1;
+                    break;
+                }
+            }
+            if(k===0){
+                unregisteredUserWishlistProducts.push(product);
+            }
+        }else{
+            unregisteredUserWishlistProducts.push(product);
+        }
+        res.status(204).send();  //////////vvi
+    });
+});
+
+app.post("/deleteFromWish",(req,res)=>{
+    let tempWishlist=[];
+    for(var i=0;i<unregisteredUserWishlistProducts.length;i++){
+        if(i!=req.body.index){
+            tempWishlist.push(unregisteredUserWishlistProducts[i]);
+        }
+    }  
+    unregisteredUserWishlistProducts=tempWishlist; 
+    res.redirect("/wish");
+});
+
+app.post("/moveToCart",(req,res)=>{
+    let tempWishlist=[];
+    let present=0;
+    for(var i=0;i<unregisteredUserWishlistProducts.length;i++){
+        if(i!=req.body.index){
+            tempWishlist.push(unregisteredUserWishlistProducts[i]);
+        }
+        else{
+            for(var j=0;j<unregisteredUserCartProducts.length;j++){
+                if(JSON.stringify(unregisteredUserCartProducts[j])===JSON.stringify(unregisteredUserWishlistProducts[i])){
+                    qty[j]=qty[j]+1;
+                    present=1;
+                    break;
+                }
+            }
+            if(present==0){
+                unregisteredUserCartProducts.push(unregisteredUserWishlistProducts[i]);
+                qty.push(1);
+            }
+        }
+    }  
+    unregisteredUserWishlistProducts=tempWishlist; 
+    res.redirect("/wish");
+});
 
 //login customer
 
@@ -154,11 +261,7 @@ app.get("/login",(req,res)=>{
     res.render("login",{"css":"register-login"});
 });
 
-//register customer
 
-app.get("/register",(req,res)=>{
-    res.render("register",{"css":"register-login"});
-});
 
 
 //verify-email
@@ -209,7 +312,38 @@ app.post("/verify-email",(req,res)=>{
 
 });
 
+//CHECKOUT!!!!
 
+app.post('/create-checkout-session', async (req, res) => {
+    var itemsArr=[];
+    for(var i=0;i<qty.length;i++){
+     itemsArr.push({
+            price_data: {
+              currency: 'inr',
+              product_data: {
+                name: unregisteredUserCartProducts[i].name,
+                images: [unregisteredUserCartProducts[i].imgUrl],
+              },
+              unit_amount: unregisteredUserCartProducts[i].price*100,
+            },
+            quantity: qty[i],
+          });
+    }
+
+    options={
+      payment_method_types: ['card'],
+      shipping_address_collection: {
+          allowed_countries: ['IN'],
+        },
+      line_items: itemsArr,
+      mode: 'payment',
+      success_url: ""+YOUR_DOMAIN+"/success",
+      cancel_url: ""+YOUR_DOMAIN+"/cancel",
+    }
+    const session = await stripe.checkout.sessions.create(options);
+    res.json({ id: session.id });
+  });
+  
 
 
 //ADMIN
@@ -233,6 +367,7 @@ app.post("/admin/addProducts",(req,res)=>{
         imgUrl:req.body.imgUrl,
         category:req.body.category
      });
+    res.redirect("/admin/addProducts");
 });
 
 app.post("/admin/logout",(req,res)=>{
@@ -240,6 +375,6 @@ app.post("/admin/logout",(req,res)=>{
 });
 
 //listening on port 
-app.listen(3000,()=>{
+app.listen(4242,()=>{
 console.log("Listening at port");
 });

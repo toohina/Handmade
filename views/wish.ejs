@@ -1,32 +1,44 @@
 <%-include("partials/header.ejs")%>
 <section class="wish">
     <div class="row row-cols-1 gy-5 mx-auto">
-     
+
+        <%if(products.length!=0){for(var i=0;i<products.length;i++){%>
         <div class="col">
-           
            
             <div class="row row-col-1 row-col-md-2">
                 <div class="col">
-                    <div class="card mx-auto" style="width: 20rem;">
-                        <img src="https://i.pinimg.com/originals/17/4c/4b/174c4ba6ab3ba7fcaba28a8c4ec4dba1.jpg" class="card-img-top" alt="...">
-                        <div class="card-body">
-                          <h5 class="card-title">Name</h5>
-                          <h2 class="card-text">Rs 10</h2>
-                        </div>
-                      </div> 
+                    <div class="card mx-auto" style="width: 175px;">
+                        <img src="<%=products[i].imgUrl%> " class="card-img-top" alt="..." height="100px">
+                            <div class="card-body">
+                              <p class="card-title"><%=products[i].name%></p>
+                              <h5 class="card-text">Rs <%=products[i].price%></h5>
+                              </div>
+                          </div>  
                 </div>
                <div class="col">
                    <div class="my-5" style="text-align: center;">
-                    <a href="#"><button class="btn-delete"><i class="fas fa-trash-alt"></i> Delete from wishList</button></a> 
+                    <form action="/deleteFromWish" method="POST">   
+                        <input type="hidden" name="index" value="<%=i%>">
+                        <button class="btn-delete"><i class="fas fa-trash-alt"></i> Delete from wishList</button>
+                    </form>
                    </div>
                    <div class="my-5"  style="text-align: center;">
-                    <a href="#"><button class="btn-move"><i class="fas fa-heart"></i> Move to the Cart</button></a> 
+                    <form action="/moveToCart" method="POST">
+                        <input type="hidden" name="index" value="<%=i%>">
+                        <button class="btn-move"><i class="fas fa-heart"></i> Move to the Cart</button>
+                    </form>
                    </div>
                </div>
             </div>      
     
         
         </div>
-        <hr>
+        <hr>              
+        <%}}else{%>
+            <div  style="padding-top:1rem">
+                <h1 class="my-5 p-md-5 py-5">The cart is Empty!</h1>
+            </div>
+     <%}%>
+        
 </section>
 <%-include("partials/footer.ejs")%>

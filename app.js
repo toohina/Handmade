@@ -467,6 +467,12 @@ app.get("/logout", (req, res) => {
 
 
 //listening on port 
-app.listen(4242, () => {
-    console.log("Listening at port");
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 4242;
+}
+app.listen(port, ()=>{
+    console.log("listening on port");
 });
+
+

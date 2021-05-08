@@ -1,77 +1,81 @@
 <%-include("./partials/header.ejs")%>
 
 
-<section class="home">
+    <div class="home">
 
-<!-- top container -->
-<div class="home-rect px-2 px-sm-5 py-3 mb-5">
-    <h1>Handmade</h1>
-    <h4>Little things handcrafted with love.</h4>
-    <div class="home-btn-div">
-       <a href="/register"> <button id="signup-btn">SIGNUP</button></a>
-        <a href="/login"><button id="login-btn">LOGIN</button></a> 
-    </div>
-</div>
-
-<!-- carousel -->
-
-<div id="carouselInterval" class="carousel slide p-sm-1 mt-4" data-bs-ride="carousel">
-    <div class="carousel-inner p-1">
-      <div class="carousel-item active " data-bs-interval="2000">
-        <div class="ads ad-1">
-            <div class="row">
-                <div class="col col-12 col-md-5 col-img">
-                    <img src="images/bookmarks.jpg" height="300px" width="300px">
-                </div> 
-                <div class="col col-12 col-md-6 px-4 mt-3">
-                    <div class="col-info">
-                        <h1>Beautiful Bookmarks</h1>
-                        <h3>From simple to stunning, modern to rustic, get all types of bookmarks right here.</h3>
-                        <a href="/bookmarks"><button type="button" class="btn-outline-black mt-sm-4 p-2">Look around</button></a>
-                    </div>
-                </div>
-            </div>      
-        </div>
-      </div>
-      <div class="carousel-item" data-bs-interval="2000">
-        <div class="ads ad-1">
-            <div class="row ">
-                <div class="col col-12 col-md-5 col-img">
-                    <img src="images/card.jpg" height="300px" width="300px">
-                </div>
-                <div class="col col-12 col-md-6 px-4 mt-3">
-                    <div class="col-info">
-                        <h1>Gorgeous Greeting Cards</h1>
-                        <h3>For every celebration big or small, get the most creative greeting card here.</h3>
-                        <a href="/cards"><button type="button" class="btn-outline-black mt-sm-4 p-2">Look around</button></a>
-                    </div>  
-                </div>
+        <!-- top container -->
+        <div class="home-rect px-2 px-sm-5 py-3 mb-5">
+            <h1>Handmade</h1>
+            <h4>Little things handcrafted with love.</h4>
+            <div class="home-btn-div">
+                <%if(!profile){%>
+                    <a href="/register"> <button id="signup-btn">SIGNUP</button></a>
+                    <a href="/login"><button id="login-btn">LOGIN</button></a>
+                    <% } %>
             </div>
         </div>
-      </div>
-      <div class="carousel-item  " data-bs-interval="2000">
-        <div class="ads ad-1">
-            <div class="row">
-                <div class="col col-12 col-md-5 col-img">
-                    <img src="images/dream-catcher.jpg" height="300px" width="300px">
-                </div>
-                <div class="col col-12 col-md-6 px-4 mt-3">
-                    <div class="col-info">
-                        <h1>Delightful Decor Items</h1>
-                        <h3>Wind chimes, Dream catchers, Wall hangings, get all the aesthetic things here. </h3>
-                        <a href="/decor"><button type="button" class="btn-outline-black mt-sm-4 p-2">Look around</button></a>
+
+    </div>
+
+    <!-- carousel -->
+
+    <div id="carouselInterval" class="carousel slide p-sm-1 mt-5" data-bs-ride="carousel">
+        <div class="carousel-inner p-1">
+            <div class="carousel-item active " data-bs-interval="2000">
+                <div class="ads ad-1">
+                    <div class="row">
+                        <div class="col col-12 col-md-5 col-img">
+                            <img src="images/bookmarks.jpg" height="300px" width="300px">
+                        </div>
+                        <div class="col col-12 col-md-6 px-4 mt-3">
+                            <div class="col-info">
+                                <h1>Beautiful Bookmarks</h1>
+                                <p>From simple to stunning, modern to rustic, get all types of bookmarks right here.</p>
+                                <a href="/bookmark"><button type="button" class="btn-outline-black mt-sm-4 p-2">Look around</button></a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+            <div class="carousel-item" data-bs-interval="2000">
+                <div class="ads ad-1">
+                    <div class="row ">
+                        <div class="col col-12 col-md-5 col-img">
+                            <img src="images/card.jpg" height="300px" width="300px">
+                        </div>
+                        <div class="col col-12 col-md-6 px-4 mt-3">
+                            <div class="col-info">
+                                <h1>Gorgeous Greeting Cards</h1>
+                                <p>For every celebration big or small, get the most creative greeting card here.</p>
+                                <a href="/card"><button type="button" class="btn-outline-black mt-sm-4 p-2">Look around</button></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item  " data-bs-interval="2000">
+                <div class="ads ad-1">
+                    <div class="row">
+                        <div class="col col-12 col-md-5 col-img">
+                            <img src="images/dream-catcher.jpg" height="300px" width="300px">
+                        </div>
+                        <div class="col col-12 col-md-6 px-4 mt-3">
+                            <div class="col-info">
+                                <h1>Delightful Decor Items</h1>
+                                <p>Wind chimes, Dream catchers, Wall hangings, get all the aesthetic things here. </p>
+                                <a href="/decor"><button type="button" class="btn-outline-black mt-sm-4 p-2">Look around</button></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselInterval"  data-bs-slide="prev">
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselInterval" data-bs-slide="prev">
       <span class="carousel-control-prev-icon"></span>
     </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselInterval"  data-bs-slide="next">
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselInterval" data-bs-slide="next">
       <span class="carousel-control-next-icon"></span>
     </button>
-  </div>
-</section>
-<%-include("./partials/footer.ejs")%>
+    </div>
+
+    <%-include("./partials/footer.ejs")%>

@@ -16,6 +16,7 @@ const app = express();
 
 //middleware
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(express.static(__dirname + "/public"));
 app.set("view engine", "ejs");
 // passport middleware
@@ -27,9 +28,15 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-const YOUR_DOMAIN = 'https://fierce-mesa-16226.herokuapp.com';
+const YOUR_DOMAIN = 'http://localhost:4242';
 
-mongoose.connect("mongodb://localhost:27017/handmadeDB", { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true });
+mongoose.connect("mongodb+srv://admin-toohina:test123@cluster0.kbrib.mongodb.net/handmadeDB", { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true });
+
+
+const userSchema = new mongoose.Schema({
+    username: String,
+    password: String,
+});
 
 const productSchema = new mongoose.Schema({
     name: String,
@@ -39,21 +46,28 @@ const productSchema = new mongoose.Schema({
 });
 
 const cartItemSchema = new mongoose.Schema({
-    product_info: productSchema,
-    qty: Number
-})
-
-const userSchema = new mongoose.Schema({
-    username: String,
-    password: String,
-    cart: [cartItemSchema],
-    wish: [productSchema]
+        ref:userSchema,
+        product:productSchema,
+        qty:{
+            type:Number,
+            default:1
+        }
 });
+
+const wishItemSchema = new mongoose.Schema({
+    ref:userSchema,
+    products:[productSchema]
+});
+
 
 userSchema.plugin(passportLocalMongoose); //hash and salt passwords
 
-const Product = mongoose.model("Product", productSchema);
+
 const User = mongoose.model("User", userSchema);
+const Product = mongoose.model("Product", productSchema);
+const CartItem=mongoose.model('Cart',cartItemSchema);
+const WishItem = mongoose.model('Wish', wishItemSchema);
+
 
 passport.use(User.createStrategy());
 
@@ -63,241 +77,270 @@ passport.deserializeUser(User.deserializeUser());
 //ROUTES
 
 
+let profile;
+
 //register customer
-let suc = true;
 app.get("/register", (req, res) => {
-    res.render("register", { "css": "register-login", "profile": false, "suc": suc });
+    res.render("register", { "css": "register-login", "profile": false, "successfulRegisteration": true });
 });
 
 app.post("/register", (req, res) => {
     User.register({ username: req.body.username }, req.body.password, function(err, user) {
         if (err) {
-            suc = false;
-            res.render("register", { "css": "register-login", "profile": false, "suc": suc });
+            res.render("register", { "css": "register-login", "profile": false, "successfulRegisteration": false });
         } else {
             passport.authenticate("local")(req, res, function() {
-                res.redirect("/home");
+                profile = true;
+                res.redirect("/");
             });
         }
     });
 });
 
-//home
-app.get("/", (req, res) => {
-    res.render("home", { "css": "home", "profile": false });
+
+
+
+//login customer
+
+app.get("/login", (req, res) => {
+    successfulLogin = true;
+    res.render("login", { "css": "register-login", "profile": false, "successfulLogin": true });
 });
 
-app.get("/home", (req, res) => {
+app.get("/login-retry", (req, res) => {
+    successfulLogin = false;
+    res.render("login", { "css": "register-login", "profile": false, "successfulLogin": false });
+});
+
+app.post("/login", (req, res) => {
+    const user = new User({
+        username: req.body.username,
+        password: req.body.password
+    });
+
+    User.findOne({ username: req.body.username }, function(err, foundUser) {
+        if (foundUser) {
+            req.login(user, function(err) {
+                if (err) {
+                    console.log(err);
+                    res.redirect("/login-retry");
+                } else {
+                    passport.authenticate("local", {
+                        failureRedirect: "/login-retry"
+                    })(req, res, function() {
+                        res.redirect("/");
+                    });
+                }
+            });
+        } else {
+            res.redirect("/login-retry");
+        }
+    });
+});
+
+
+//home
+
+
+app.get("/", (req, res) => {
     if (req.isAuthenticated()) {
-        res.render("home", { "css": "home", "profile": true });
+        profile = true;
     } else {
-        res.redirect("/login");
+        profile = false;
     }
+    res.render("home", { "css": "home", "profile": profile });
 });
 
 
 //products
 app.get("/bookmark", (req, res) => {
     Product.find({ category: "bookmark" }, (err, bookmarks) => {
-        res.render("products", { css: "products", products: bookmarks });
+        if (req.isAuthenticated()) {
+            res.render("products", { css: "products", products: bookmarks, "profile": true });
+        } else {
+            res.render("products", { css: "products", products: bookmarks, "profile": false });
+        }
     });
 });
 
 app.get("/card", (req, res) => {
     Product.find({ category: "card" }, (err, cards) => {
-        res.render("products", { css: "products", products: cards });
+        if (req.isAuthenticated()) {
+            res.render("products", { css: "products", products: cards, "profile": true });
+        } else {
+            res.render("products", { css: "products", products: cards, "profile": false });
+        }
     });
 });
 
 app.get("/decor", (req, res) => {
     Product.find({ category: "decor" }, (err, decors) => {
-        res.render("products", { css: "products", products: decors });
+        if (req.isAuthenticated()) {
+            res.render("products", { css: "products", products: decors, "profile": true });
+        } else {
+            res.render("products", { css: "products", products: decors, "profile": false });
+        }
     });
 });
 
+///////////////////////////////////////////////////////wishlist///////////////////////////////////////////////
+app.get("/wish",(req, res)=>{
+    if(req.isAuthenticated()){
+        WishItem.findOne({'ref._id': req.user._id},(err,foundItem)=>{
+            res.render("wish", { css: "wish", item:foundItem,"profile": true});
+        });
+    }else{
+        res.redirect("/login");
+    }
+});
+
+app.post("/deleteFromWish", (req, res)=>{
+    WishItem.findOneAndUpdate({'ref._id': req.user._id},{$pull:{products:{_id:req.body.id}}},(err,list)=>{
+        if(err){
+            console.log(err);
+        }else{
+            res.redirect("/wish");
+        }
+      
+    });
+});
+
+app.post("/moveToCart",(req, res)=>{
+    WishItem.findOneAndUpdate({'ref._id': req.user._id},{$pull:{products:{_id:req.body.id}}},(err,list)=>{
+        if(err){
+            console.log(err);
+        }else{
+
+            Product.findById(req.body.id,(err,foundProduct) => {
+                CartItem.findOneAndUpdate({'ref._id' : req.user._id, 'product._id':req.body.productId},{$inc:{'qty':1}},{new:true},(err,foundCartItem) => {
+                    if(err){
+                        console.log(err);
+                    }else{
+                        if(!foundCartItem){
+                            const newCartItem = new CartItem({
+                                ref:req.user,
+                                product:foundProduct,
+                                qty:1
+                            });
+                            newCartItem.save();
+                        }else{
+                            console.log(foundCartItem);
+                        }
+                    }
+                });
+            });
+            
+            res.redirect("/wish");
+        } 
+    });
+});
 
 ////////////////////////////////////////////////////////cart///////////////////////////////////////////////////
-let unregisteredUserCartProducts = [];
-let qty = [];
-let total = 0;
-
-let unregisteredUserWishlistProducts = [];
-
-app.get("/cart", (req, res) => {
-    //if user is registered
-
-
-    //else 
-    sum = 0;
-    for (var i = 0; i < unregisteredUserCartProducts.length; i++) {
-        sum += unregisteredUserCartProducts[i].price * qty[i];
+app.get("/cart",(req, res)=>{
+    if(req.isAuthenticated()){
+        CartItem.find({'ref._id':req.user._id},(err,cartItems)=>{
+            console.log(cartItems);
+            res.render("cart",{css:"cart","profile":true,"cartItems":cartItems});
+        });
+    }else{
+        res.redirect("/login");
     }
-    total = sum;
-    res.render("cart", { css: "cart", products: unregisteredUserCartProducts, qty: qty, total: total });
 });
 
-app.post("/addToCart", (req, res) => {
-    // if user is registered
-
-
-    //else
-
-    Product.findOne({ "_id": req.body.productId }, (err, product) => {
-        let k = 0;
-        if (unregisteredUserCartProducts.length != 0) {
-            for (var i = 0; i < unregisteredUserCartProducts.length; i++) {
-                if (JSON.stringify(unregisteredUserCartProducts[i]) === JSON.stringify(product)) {
-                    qty[i] = Number(qty[i]) + 1;
-                    k = 1;
-                    break;
-                }
-            }
-            if (k === 0) {
-                qty.push(1);
-                unregisteredUserCartProducts.push(product);
-            }
-        } else {
-            qty.push(1);
-            unregisteredUserCartProducts.push(product);
-        }
-        res.status(204).send(); //////////vvi
+app.post("/changeQty",(req,res)=>{
+    CartItem.findOneAndUpdate({_id:req.body.id},{qty:req.body.qty},{new:true},(err,updatedItem)=>{
+        console.log(updatedItem);
+        res.redirect("/cart");
     });
 });
 
-app.post("/changeQty", (req, res) => {
-    //if registered
-
-
-
-    //else
-    qty[req.body.index] = req.body.qty;
-
-    //res.status(204).send();
-    res.redirect("/cart");
-});
-
-app.post("/deleteFromCart", (req, res) => {
-    //if registered
-
-
-    //else
-    let tempQty = [];
-    let tempUnregisteredUserCartProducts = [];
-    for (var i = 0; i < qty.length; i++) {
-        if (i != req.body.index) {
-            tempQty.push(qty[i]);
-            tempUnregisteredUserCartProducts.push(unregisteredUserCartProducts[i]);
+app.post("/deleteFromCart",(req, res)=>{
+    CartItem.findOneAndDelete({_id:req.body.id},(err,success)=>{
+        if(err){
+            console.log(err);
+        }else{
+            res.redirect("/cart");
+            console.log(success);
         }
-    }
-    qty = tempQty.slice();
-    unregisteredUserCartProducts = tempUnregisteredUserCartProducts.slice();
-    res.redirect("/cart");
-});
-
-app.post("/moveToWishlist", (req, res) => {
-    let present = 0;
-    for (var i = 0; i < unregisteredUserWishlistProducts.length; i++) {
-        console.log(unregisteredUserWishlistProducts[i]);
-        if (JSON.stringify(unregisteredUserWishlistProducts[i]) === JSON.stringify(unregisteredUserCartProducts[req.body.index])) {
-            present = 1;
-            break;
-        }
-    }
-    if (present == 0) {
-        unregisteredUserWishlistProducts.push(unregisteredUserCartProducts[req.body.index])
-    }
-
-    let tempQty = [];
-    let tempUnregisteredUserCartProducts = [];
-    for (var i = 0; i < qty.length; i++) {
-        if (i != req.body.index) {
-            tempQty.push(qty[i]);
-            tempUnregisteredUserCartProducts.push(unregisteredUserCartProducts[i]);
-        }
-    }
-    qty = tempQty;
-    unregisteredUserCartProducts = tempUnregisteredUserCartProducts;
-    res.redirect("/cart");
-});
-
-
-//////////////////////////////////////////////////////////////wish///////////////////////////////////////////////////////////
-
-
-app.get("/wish", (req, res) => {
-    res.render("wish", { css: "wish", products: unregisteredUserWishlistProducts });
-});
-
-app.post("/addToWishlist", (req, res) => {
-    // if user is registered
-
-
-    //else
-
-    Product.findOne({ "_id": req.body.productId }, (err, product) => {
-        let k = 0;
-        if (unregisteredUserWishlistProducts.length != 0) {
-            for (var i = 0; i < unregisteredUserWishlistProducts.length; i++) {
-                if (JSON.stringify(unregisteredUserWishlistProducts[i]) === JSON.stringify(product)) {
-                    k = 1;
-                    break;
-                }
-            }
-            if (k === 0) {
-                unregisteredUserWishlistProducts.push(product);
-            }
-        } else {
-            unregisteredUserWishlistProducts.push(product);
-        }
-        res.status(204).send(); //////////vvi
     });
 });
 
-app.post("/deleteFromWish", (req, res) => {
-    let tempWishlist = [];
-    for (var i = 0; i < unregisteredUserWishlistProducts.length; i++) {
-        if (i != req.body.index) {
-            tempWishlist.push(unregisteredUserWishlistProducts[i]);
-        }
-    }
-    unregisteredUserWishlistProducts = tempWishlist;
-    res.redirect("/wish");
+app.post("/moveToWishlist",(req, res)=>{
+    Product.findOne({_id:req.body.id},(err, product)=>{
+        WishItem.findOneAndUpdate({'ref._id': req.user._id},{$addToSet:{products:product}},{new:true},(err,updatedItem)=>{
+            console.log(updatedItem);
+        });
+        CartItem.findOneAndDelete({_id:req.body.itemId},(err,success)=>{
+            if(err){
+                console.log(err);
+            }else{
+                res.redirect("/cart");
+                console.log(success);
+            }
+        });
+    });
 });
 
-app.post("/moveToCart", (req, res) => {
-    let tempWishlist = [];
-    let present = 0;
-    for (var i = 0; i < unregisteredUserWishlistProducts.length; i++) {
-        if (i != req.body.index) {
-            tempWishlist.push(unregisteredUserWishlistProducts[i]);
-        } else {
-            for (var j = 0; j < unregisteredUserCartProducts.length; j++) {
-                if (JSON.stringify(unregisteredUserCartProducts[j]) === JSON.stringify(unregisteredUserWishlistProducts[i])) {
-                    qty[j] = qty[j] + 1;
-                    present = 1;
-                    break;
+app.post("/addToCart",(req, res) => {
+    if(req.isAuthenticated()){
+        Product.findById(req.body.productId,(err,foundProduct) => {
+
+            CartItem.findOneAndUpdate({'ref._id' : req.user._id, 'product._id':req.body.productId},{$inc:{'qty':1}},{new:true},(err,foundCartItem) => {
+                if(err){
+                    console.log(err);
+                }else{
+                    if(!foundCartItem){
+                        const newCartItem = new CartItem({
+                            ref:req.user,
+                            product:foundProduct,
+                            qty:1
+                        });
+                        newCartItem.save();
+                    }else{
+                        console.log(foundCartItem);
+                    }
                 }
-            }
-            if (present == 0) {
-                unregisteredUserCartProducts.push(unregisteredUserWishlistProducts[i]);
-                qty.push(1);
-            }
-        }
+            });
+        });
+        res.redirect("/"+req.body.page);
+
+    }else{
+        res.redirect("/login");
     }
-    unregisteredUserWishlistProducts = tempWishlist;
-    res.redirect("/wish");
+   
 });
 
-//login customer
+app.post("/addToWishlist",(req, res) => {
+    if(req.isAuthenticated()){
+        Product.findById(req.body.productId,(err,foundProduct) => {
 
-app.get("/login", (req, res) => {
-    res.render("login", { "css": "register-login" });
+            WishItem.findOneAndUpdate({'ref._id': req.user._id},{$addToSet:{'products':foundProduct}},{new:true},(err,updatedWishItem) => {
+                if(err){
+                    console.log(err);
+                }else{
+                    if(!updatedWishItem){
+                        const newWishItem =new WishItem({
+                            ref:req.user,
+                            products:[foundProduct]
+                        });
+                        newWishItem.save();
+                    }else{
+                        console.log(updatedWishItem);
+                    }
+                }
+            });
+    
+        });
+            res.redirect("/"+req.body.page);
+
+    }else{
+        res.redirect("/login");
+    }
+   
 });
 
 
-
-
-//verify-email
+//////////////////////////////////////////////////////////////verify-email///////////////////////////////////////////////
 
 // var otp;
 // app.get("/verify-email", (req, res) => {
@@ -347,64 +390,81 @@ app.get("/login", (req, res) => {
 
 //CHECKOUT!!!!
 
-app.post('/create-checkout-session', async(req, res) => {
-    var itemsArr = [];
-    for (var i = 0; i < qty.length; i++) {
-        itemsArr.push({
-            price_data: {
-                currency: 'inr',
-                product_data: {
-                    name: unregisteredUserCartProducts[i].name,
-                    images: [unregisteredUserCartProducts[i].imgUrl],
-                },
-                unit_amount: unregisteredUserCartProducts[i].price * 100,
-            },
-            quantity: qty[i],
+app.get("/success",(req, res)=>{
+    if(req.isAuthenticated()){
+        CartItem.deleteMany({'ref._id' : req.user._id},(err,success)=>{
+            if(err){
+                console.log(err);
+            }else{
+                res.render("success",{css:"success", profile:true});
+            }
         });
-    }
-
-    options = {
-        payment_method_types: ['card'],
-        shipping_address_collection: {
-            allowed_countries: ['IN'],
-        },
-        line_items: itemsArr,
-        mode: 'payment',
-        success_url: "" + YOUR_DOMAIN + "/success",
-        cancel_url: "" + YOUR_DOMAIN + "/cancel",
-    }
-    const session = await stripe.checkout.sessions.create(options);
-    res.json({ id: session.id });
-});
-
-
-
-//ADMIN
-app.get("/admin", (req, res) => {
-    res.render("admin-login");
-});
-app.post("/admin", (req, res) => {
-    if (req.body.email === "toohi2000@gmail.com" && req.body.password === "secretsilver") {
-        res.redirect("/admin/addProducts");
+    }else{
+        res.redirect("/login");
     }
 });
 
-app.get("/admin/addProducts", (req, res) => {
-    res.render("admin-addProducts");
+app.get("/cancel",(req, res)=>{
+    if(req.isAuthenticated()){
+        res.render("cancel",{css:"success", profile:true});
+    }else{
+        res.redirect("/login");
+    }
 });
-app.post("/admin/addProducts", (req, res) => {
-    Product.create({
-        name: req.body.name,
-        price: Number(req.body.price),
-        imgUrl: req.body.imgUrl,
-        category: req.body.category
+
+
+app.post('/create-checkout-session',(req, res) => {
+   
+    
+
+    CartItem.find({'ref._id': req.user._id}, async(err,foundCartItems)=>{
+
+     
+
+        var itemsArr = [];
+        
+        foundCartItems.forEach(item =>{
+            itemsArr.push({
+                price_data: {
+                    currency: 'inr',
+                    product_data: {
+                        name: item.product.name,
+                        images: [item.product.imgUrl],
+                    },
+                    unit_amount: item.product.price * 100,
+                },
+                quantity: item.qty,
+            });
+        });
+
+        options = {
+            payment_method_types: ['card'],
+            shipping_address_collection: {
+                allowed_countries: ['IN'],
+            },
+            line_items: itemsArr,
+            mode: 'payment',
+            success_url: "" + YOUR_DOMAIN + "/success",
+            cancel_url: "" + YOUR_DOMAIN + "/cancel",
+        }
+        const session = await stripe.checkout.sessions.create(options);
+        res.json({ id: session.id });
+
+  
+       
     });
-    res.redirect("/admin/addProducts");
+
+ 
+
+  
 });
 
-app.post("/admin/logout", (req, res) => {
-    res.redirect("/admin");
+//logout
+app.get("/logout", (req, res) => {
+    req.logOut();
+    res.redirect("/");
 });
+
 
 //listening on port 
 app.listen(4242, () => {

@@ -1,54 +1,58 @@
 <%-include("partials/header.ejs")%>
-<section class="cart">
-        <%if(products.length!=0){%>
-            <div class="btn-buy-div"><h2 class="total">Rs <%= total %> </h2>
+    <section class="cart">
+        <%if(cartItems.length!=0){%>
+            <div class="btn-buy-div">
                 <button class="btn-buy" id="checkout-button">Checkout</button>
-            </div> 
+            </div>
             <hr>
-            <%for(var i=0;i<products.length;i++){%>
-                <input type="hidden" name="productId" value="<%=products[i].id%>">
-                <div class="center">   
+            <%cartItems.forEach(item => {%>
+                <div class="center">
                     <div class="in mx-5">
                         <div class="card" style="width: 175px;">
-                            <img src="<%=products[i].imgUrl%> " class="card-img-top" alt="..." height="100px">
-                                <div class="card-body">
-                                  <p class="card-title"><%=products[i].name%></p>
-                                  <h5 class="card-text">Rs <%=products[i].price%></h5>
-                                  </div>
-                              </div>  
+                            <img src="<%=item.product.imgUrl%> " class="card-img-top" alt="..." height="100px">
+                            <div class="card-body">
+                                <p class="card-title">
+                                    <%=item.product.name%>
+                                </p>
+                                <h5 class="card-text">Rs
+                                    <%=item.product.price%>
+                                </h5>
+                            </div>
+                        </div>
                     </div>
-               
-                          <div class="in-2 mx-5">
-                            <div class="my-3">
-                                <form action="/changeQty" method="POST">
-                                 <input type="hidden" name="index" value="<%=i%>">
-                                 <h5>Quantity:      <input onChange="this.form.submit()" class="qty" type="number" name="qty" min="1" max="20" value="<%=qty[i]%>"></h5>
-                                </form>
-                            </div>
-                            <div class="my-3">
-                                <form action="/deleteFromCart" method="POST">
-                                    <input type="hidden" name="index" value="<%=i%>">
-                                    <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i> Delete from cart</button>
-                                 </form>
-                             </div>
-                            <div class="my-3">
-                                <form action="/moveToWishlist" method="POST">
-                                    <input type="hidden" name="index" value="<%=i%>">
-                                    <button type="submit" class="btn-move"><i class="fas fa-heart"></i> Move to wishlist</button> 
-                                </form>
-                            </div>
-                          </div>
-                       
-                       </div>  
-                       <hr>  
-                     
-        <%}%>
-        <!-- <div class="btn-buy-div"><h2 class="total"></h2><button class="btn-buy" >BUY NOW</button></a></div>  -->
-        <%}else{%>
-            <div  style="padding-top:4rem">
-                <h1 class="my-5 p-md-5 py-5">The cart is Empty!</h1>
-            </div>
-     <%}%>
- 
-</section>
-<%-include("partials/footer.ejs")%>
+
+                    <div class="in-2 mx-5">
+                        <div class="my-3">
+                            <form action="/changeQty" method="POST">
+                                <input type="hidden" name="id" value="<%=item._id%>">
+                                <h5>Quantity: <input onChange="this.form.submit()" class="qty" type="number" name="qty" min="1" max="20" value="<%=item.qty%>"></h5>
+                            </form>
+                        </div>
+                        <div class="my-3">
+                            <form action="/deleteFromCart" method="POST">
+                                <input type="hidden" name="id" value="<%=item._id%>">
+                                <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i> Delete from cart</button>
+                            </form>
+                        </div>
+                        <div class="my-3">
+                            <form action="/moveToWishlist" method="POST">
+                                <input type="hidden" name="id" value="<%=item.product._id%>">
+                                <input type="hidden" name="itemId" value="<%=item._id%>">
+                                <button type="submit" class="btn-move"><i class="fas fa-heart"></i> Move to wishlist</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+                <hr>
+
+                <%});%>
+                    <!-- <div class="btn-buy-div"><h2 class="total"></h2><button class="btn-buy" >BUY NOW</button></a></div>  -->
+                    <%}else{%>
+                        <div style="padding-top:4rem" class="pb-4">
+                            <h1 class="mx-1 my-5 p-md-5 py-5">The cart is Empty!</h1>
+                        </div>
+                        <%}%>
+
+    </section>
+    <%-include("partials/footer.ejs")%>

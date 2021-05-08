@@ -28,7 +28,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-const YOUR_DOMAIN = 'http://localhost:4242';
+const YOUR_DOMAIN = 'https://hidden-brook-62306.herokuapp.com';
 
 mongoose.connect("mongodb+srv://admin-toohina:test123@cluster0.kbrib.mongodb.net/handmadeDB", { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true });
 
